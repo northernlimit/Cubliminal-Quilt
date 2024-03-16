@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "cubliminal:block/fluorescent_light_off"
+    },
+    "lit=true": {
+      "model": "cubliminal:block/fluorescent_light_on"
+    }
+  }
+}

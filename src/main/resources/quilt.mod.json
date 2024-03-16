@@ -1,0 +1,45 @@
+{
+	"schema_version": 1,
+	"quilt_loader": {
+		"group": "${group}",
+		"id": "cubliminal",
+		"version": "${version}",
+		"metadata": {
+			"name": "Cubliminal",
+			"description": "Cubliminal aims to be a faithful representation of backrooms lore.",
+			"contributors": {
+				"Your name here": "northernlimit"
+			},
+			"contact": {
+				"issues": "https://github.com/QuiltMC/quilt-template-mod/issues",
+				"sources": "https://github.com/QuiltMC/quilt-template-mod"
+			},
+			"icon": "assets/cubliminal/icon.png"
+		},
+		"intermediate_mappings": "net.fabricmc:intermediary",
+		"entrypoints": {
+			"init": "net.limit.cubliminal.Cubliminal",
+			"client_init": "net.limit.cubliminal.CubliminalClient",
+			"limlib:registrar": "net.limit.cubliminal.init.ModWorlds"
+		},
+		"depends": [
+			{
+				"id": "quilt_loader",
+				"versions": ">=0.19.1"
+			},
+			{
+				"id": "quilted_fabric_api",
+				"versions": ">=7.0.2"
+			},
+			{
+				"id": "minecraft",
+				"versions": ">=1.20"
+			},
+			{
+				"id": "limlib",
+				"versions": ">=11.0.0"
+			}
+		]
+	},
+	"mixin": "cubliminal.mixins.json"
+}

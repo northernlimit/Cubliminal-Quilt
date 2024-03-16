@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:jigsaw",
+  "start_pool": "cubliminal:0space_bacteria/start_pool",
+  "biomes": "#cubliminal:has_structure/0space_bacteria",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "size": 1,
+  "start_height": {
+    "type": "minecraft:uniform",
+    "min_inclusive": {
+      "absolute": 0
+    },
+    "max_inclusive": {
+      "absolute": 0
+    }
+  },
+  "max_distance_from_center": 80,
+  "use_expansion_hack": false
+}

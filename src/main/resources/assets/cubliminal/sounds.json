@@ -1,0 +1,59 @@
+{
+  "ambient_0": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "cubliminal:ambient0",
+        "stream": true
+      }
+    ]
+  },
+  "ambient_37": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "cubliminal:ambient37",
+        "stream": true
+      }
+    ]
+  },
+  "bacteria_step": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "cubliminal:bacteria_step",
+        "stream": false
+      }
+    ]
+  },
+  "bacteria_ambient": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "cubliminal:bacteria_idle1"
+      },
+      {
+        "name": "cubliminal:bacteria_idle2"
+      },
+      {
+        "name": "cubliminal:bacteria_idle3"
+      }
+    ]
+  },
+  "heartbeat": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "cubliminal:heartbeat"
+      }
+    ]
+  },
+  "whispering": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "cubliminal:whispering"
+      }
+    ]
+  }
+}
