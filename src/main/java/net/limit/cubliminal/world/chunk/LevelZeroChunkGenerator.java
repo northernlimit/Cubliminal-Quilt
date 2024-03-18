@@ -5,16 +5,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.limit.cubliminal.Cubliminal;
 import net.limit.cubliminal.init.ModWorlds;
+import net.ludocrypt.limlib.api.world.LimlibHelper;
 import net.ludocrypt.limlib.api.world.NbtGroup;
 import net.ludocrypt.limlib.api.world.chunk.AbstractNbtChunkGenerator;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerLightingProvider;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.random.RandomGenerator;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
@@ -43,12 +43,40 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 	public static NbtGroup createGroup() {
 		return NbtGroup.Builder
 			.create(Cubliminal.id(ModWorlds.THE_LOBBY))
-			.with("piece", 1, 4)
+			.with("0space", 1, 1)
+			.with("0block", 1, 1)
+			.with("0column", 1, 2)
+			.with("0corridor", 1, 2)
+			.with("0midwall", 1, 2)
+			.with("0wall", 1, 4)
+			.with("0corner", 1, 4)
+			.with("0thickcorner", 1, 4)
+			.with("0thickwall", 1, 4)
+			.with("0tinywall", 1, 4)
+			.with("0twowalls", 1, 16)
 			.build();
 	}
 	@Override
 	protected Codec<? extends ChunkGenerator> getCodec() {
 		return CODEC;
+	}
+
+	public void decorateRoom(ChunkRegion region, BlockPos pos){
+		RandomGenerator random = RandomGenerator
+			.createLegacy(region.getSeed() + LimlibHelper.blockSeed(pos));
+
+		if (random.nextInt(3) == 0) {
+			generateNbt(region, pos, nbtGroup.pick("0space", random));
+		} else {
+			if (random.nextInt(3) == 0) {
+				generateNbt(region, pos, nbtGroup.pick(nbtGroup
+					.chooseGroup(random, "0block", "0column", "0corridor", "0tinywall"), random));
+			} else {
+				generateNbt(region, pos, nbtGroup.pick(nbtGroup
+					.chooseGroup(random, "0corner", "0wall", "0midwall"
+						, "0thickcorner", "0thickwall", "0twowalls"), random));
+			}
+		}
 	}
 
 	@Override
@@ -61,7 +89,7 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 		BlockPos startPos = chunk.getPos().getStartPos();
 		ChunkPos chunkPos = new ChunkPos(startPos);
 		BlockPos originCoords = chunkPos.getBlockPos(0, 0, 0);
-		int spacing = 5;
+		int spacing = 6;
 		int originX = originCoords.getX();
 		int originZ = originCoords.getZ();
 
@@ -91,10 +119,9 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 			for (int x = 0; x < timesX; x++) {
 				for (int z = 0; z < timesZ; z++) {
 					BlockPos offsetPos = startPos.add(x * spacing + offsetX, 0, z * spacing + offsetZ);
-					/*RandomGenerator pieceRandom = RandomGenerator
-						.createLegacy(region.getSeed() + LimlibHelper.blockSeed(offsetPos));
-					generateNbt(region, offsetPos, nbtGroup.pick("piece", pieceRandom));
-					*/region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
+					decorateRoom(region, offsetPos);
+
+					//region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
 				}
 			}
 		} else if (originX < 0 && originZ >= 0) {
@@ -123,10 +150,9 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 			for (int x = 0; x < timesX; x++) {
 				for (int z = 0; z < timesZ; z++) {
 					BlockPos offsetPos = startPos.add(15 - (x * spacing + offsetX), 0, z * spacing + offsetZ);
-					/*RandomGenerator pieceRandom = RandomGenerator
-						.createLegacy(region.getSeed() + LimlibHelper.blockSeed(offsetPos));
-					generateNbt(region, offsetPos, nbtGroup.pick("piece", pieceRandom));
-					*/region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
+					decorateRoom(region, offsetPos);
+
+					//region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
 				}
 			}
 		} else if (originX < 0) {
@@ -155,10 +181,9 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 			for (int x = 0; x < timesX; x++) {
 				for (int z = 0; z < timesZ; z++) {
 					BlockPos offsetPos = startPos.add(15 - (x * spacing + offsetX), 0, 15 - (z * spacing + offsetZ));
-					/*RandomGenerator pieceRandom = RandomGenerator
-						.createLegacy(region.getSeed() + LimlibHelper.blockSeed(offsetPos));
-					generateNbt(region, offsetPos, nbtGroup.pick("piece", pieceRandom));
-					*/region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
+					decorateRoom(region, offsetPos);
+
+					//region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
 				}
 			}
 		} else {
@@ -187,10 +212,9 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 			for (int x = 0; x < timesX; x++) {
 				for (int z = 0; z < timesZ; z++) {
 					BlockPos offsetPos = startPos.add(x * spacing + offsetX, 0, 15 - (z * spacing + offsetZ));
-					/*RandomGenerator pieceRandom = RandomGenerator
-						.createLegacy(region.getSeed() + LimlibHelper.blockSeed(offsetPos));
-					generateNbt(region, offsetPos, nbtGroup.pick("piece", pieceRandom));
-					*/region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
+					decorateRoom(region, offsetPos);
+
+					//region.setBlockState(offsetPos, Blocks.SHROOMLIGHT.getDefaultState(), Block.FORCE_STATE);
 				}
 			}
 		}
