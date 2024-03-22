@@ -6,12 +6,17 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.random.RandomGenerator;
@@ -25,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 public class FluorescentLightBlock extends BlockWithEntity implements BlockEntityProvider {
 
 	private static final BooleanProperty LIT = Properties.LIT;
+	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 	private static final VoxelShape VOXEL_SHAPE = Block.createCuboidShape(0, 15,0, 16, 16, 16);
 
 	@Override
@@ -39,7 +45,7 @@ public class FluorescentLightBlock extends BlockWithEntity implements BlockEntit
 
 	public FluorescentLightBlock(Settings settings) {
 		super(settings);
-		this.setDefaultState(this.stateManager.getDefaultState().with(LIT, true));
+		this.setDefaultState(this.stateManager.getDefaultState().with(LIT, true).with(FACING, Direction.NORTH));
 	}
 
 	@Override
@@ -60,6 +66,30 @@ public class FluorescentLightBlock extends BlockWithEntity implements BlockEntit
 		}
 	}
 
+	@Override
+	public BlockState rotate(BlockState state, BlockRotation rotation) {
+		return state.with(FACING, rotation.rotate(state.get(FACING)));
+	}
+
+	@Override
+	public BlockState mirror(BlockState state, BlockMirror mirror) {
+		return state.rotate(mirror.getRotation(state.get(FACING)));
+	}
+
+	@Nullable
+	@Override
+	public BlockState getPlacementState(ItemPlacementContext ctx) {
+		BlockState blockState = this.getDefaultState();
+		Direction direction = ctx.getSide();
+		if (!ctx.canReplaceExisting() && direction.getAxis().isHorizontal()) {
+			blockState = blockState.with(FACING, direction);
+		} else {
+			blockState = blockState.with(FACING, ctx.getPlayerFacing().getOpposite());
+		}
+
+		return blockState;
+	}
+
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return FluorescentLightBlock::tick;
@@ -76,13 +106,9 @@ public class FluorescentLightBlock extends BlockWithEntity implements BlockEntit
 		}
 	}
 
-	public static void playSound(World world, BlockPos pos, SoundEvent sound) {
-		world.playSound((PlayerEntity)null, pos, sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-	}
-
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		builder.add(LIT);
+		builder.add(LIT, FACING);
 	}
 
 	@Nullable

@@ -74,7 +74,7 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 		} else if (random.nextInt(4) == 0) {
 			generateNbt(region, pos, nbtGroup.pick(nbtGroup
 				.chooseGroup(random, "0block", "0column", "0tinywall", "0corridor"), random));
-		} else if (random.nextInt(60) == 0) {
+		} else if (random.nextInt(200) == 0) {
 			generateNbt(region, pos, nbtGroup.pick(nbtGroup
 				.chooseGroup(random, "0tinywall"), random));
 		} else {
@@ -233,17 +233,31 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 		RandomGenerator random = RandomGenerator
 			.createLegacy(region.getSeed() + LimlibHelper.blockSeed(pos));
 
-		if (state.isOf(Blocks.WHITE_CONCRETE) && random.nextInt(6) == 0) {
-			region.setBlockState(pos, ModBlocks.FUSED_FLUORESCENT_LIGHT.getDefaultState(),
+		if (state.isOf(Blocks.IRON_TRAPDOOR) && random.nextInt(6) == 0) {
+			region.setBlockState(pos, ModBlocks.FUSED_FLUORESCENT_LIGHT.getDefaultState()
+					.with(TrapdoorBlock.FACING, state.get(TrapdoorBlock.FACING)),
 				Block.NOTIFY_ALL, 1);
-		} else if (state.isOf(Blocks.WHITE_CONCRETE)) {
-			region.setBlockState(pos, ModBlocks.FLUORESCENT_LIGHT.getDefaultState(),
+		} else if (state.isOf(Blocks.IRON_TRAPDOOR)) {
+			region.setBlockState(pos, ModBlocks.FLUORESCENT_LIGHT.getDefaultState()
+					.with(TrapdoorBlock.FACING, state.get(TrapdoorBlock.FACING)),
+				Block.NOTIFY_ALL, 1);
+		}
+
+		boolean bl = region.getBlockState(pos.north()).isOf(ModBlocks.FUSED_FLUORESCENT_LIGHT)
+			|| region.getBlockState(pos.west()).isOf(ModBlocks.FUSED_FLUORESCENT_LIGHT)
+			|| region.getBlockState(pos.east()).isOf(ModBlocks.FUSED_FLUORESCENT_LIGHT)
+			|| region.getBlockState(pos.south()).isOf(ModBlocks.FUSED_FLUORESCENT_LIGHT);
+
+		if (state.isOf(Blocks.IRON_TRAPDOOR) && bl) {
+			region.setBlockState(pos, ModBlocks.FUSED_FLUORESCENT_LIGHT.getDefaultState()
+					.with(TrapdoorBlock.FACING, state.get(TrapdoorBlock.FACING)),
 				Block.NOTIFY_ALL, 1);
 		}
 
 		if (state.isOf(Blocks.WALL_TORCH) && random.nextInt(10) == 0) {
 			region.setBlockState(pos, ModBlocks.ELECTRIC_PLUG.getDefaultState()
-				.with(WallTorchBlock.FACING, state.get(WallTorchBlock.FACING)), Block.NOTIFY_ALL);
+					.with(WallTorchBlock.FACING, state.get(WallTorchBlock.FACING))
+				, Block.NOTIFY_ALL, 1);
 		} else if (state.isOf(Blocks.WALL_TORCH)) {
 			region.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL, 1);
 		}
