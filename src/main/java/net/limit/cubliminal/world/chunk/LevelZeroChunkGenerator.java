@@ -4,10 +4,13 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.limit.cubliminal.Cubliminal;
+import net.limit.cubliminal.init.ModBlocks;
 import net.limit.cubliminal.init.ModWorlds;
 import net.ludocrypt.limlib.api.world.LimlibHelper;
 import net.ludocrypt.limlib.api.world.NbtGroup;
 import net.ludocrypt.limlib.api.world.chunk.AbstractNbtChunkGenerator;
+import net.minecraft.block.*;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerLightingProvider;
 import net.minecraft.server.world.ServerWorld;
@@ -23,6 +26,7 @@ import net.minecraft.world.gen.RandomState;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
@@ -65,17 +69,18 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 		RandomGenerator random = RandomGenerator
 			.createLegacy(region.getSeed() + LimlibHelper.blockSeed(pos));
 
-		if (random.nextInt(3) == 0) {
+		if (random.nextInt(5) == 0) {
 			generateNbt(region, pos, nbtGroup.pick("0space", random));
+		} else if (random.nextInt(4) == 0) {
+			generateNbt(region, pos, nbtGroup.pick(nbtGroup
+				.chooseGroup(random, "0block", "0column", "0tinywall", "0corridor"), random));
+		} else if (random.nextInt(60) == 0) {
+			generateNbt(region, pos, nbtGroup.pick(nbtGroup
+				.chooseGroup(random, "0tinywall"), random));
 		} else {
-			if (random.nextInt(3) == 0) {
-				generateNbt(region, pos, nbtGroup.pick(nbtGroup
-					.chooseGroup(random, "0block", "0column", "0corridor", "0tinywall"), random));
-			} else {
-				generateNbt(region, pos, nbtGroup.pick(nbtGroup
-					.chooseGroup(random, "0corner", "0wall", "0midwall"
-						, "0thickcorner", "0thickwall", "0twowalls"), random));
-			}
+			generateNbt(region, pos, nbtGroup.pick(nbtGroup
+				.chooseGroup(random, "0corner", "0wall", "0midwall"
+					, "0thickcorner", "0thickwall", "0twowalls"), random));
 		}
 	}
 
@@ -219,6 +224,49 @@ public class LevelZeroChunkGenerator extends AbstractNbtChunkGenerator {
 			}
 		}
 		return CompletableFuture.completedFuture(chunk);
+	}
+
+	@Override
+	protected void modifyStructure(ChunkRegion region, BlockPos pos, BlockState state, Optional<NbtCompound> blockEntityNbt) {
+		super.modifyStructure(region, pos, state, blockEntityNbt);
+
+		RandomGenerator random = RandomGenerator
+			.createLegacy(region.getSeed() + LimlibHelper.blockSeed(pos));
+
+		if (state.isOf(Blocks.WHITE_CONCRETE) && random.nextInt(6) == 0) {
+			region.setBlockState(pos, ModBlocks.FUSED_FLUORESCENT_LIGHT.getDefaultState(),
+				Block.NOTIFY_ALL, 1);
+		} else if (state.isOf(Blocks.WHITE_CONCRETE)) {
+			region.setBlockState(pos, ModBlocks.FLUORESCENT_LIGHT.getDefaultState(),
+				Block.NOTIFY_ALL, 1);
+		}
+
+		if (state.isOf(Blocks.WALL_TORCH) && random.nextInt(10) == 0) {
+			region.setBlockState(pos, ModBlocks.ELECTRIC_PLUG.getDefaultState()
+				.with(WallTorchBlock.FACING, state.get(WallTorchBlock.FACING)), Block.NOTIFY_ALL);
+		} else if (state.isOf(Blocks.WALL_TORCH)) {
+			region.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL, 1);
+		}
+
+		if (state.isOf(Blocks.DARK_OAK_PLANKS) && random.nextInt(20) == 0) {
+			region.setBlockState(pos, ModBlocks.DAMAGED_YELLOW_WALLPAPERS.getDefaultState(),
+				Block.NOTIFY_ALL, 1);
+		} else if (state.isOf(Blocks.DARK_OAK_PLANKS)) {
+			region.setBlockState(pos, ModBlocks.YELLOW_WALLPAPERS.getDefaultState(),
+				Block.NOTIFY_ALL, 1);
+		}
+
+		if (state.isOf(Blocks.YELLOW_WOOL) && random.nextInt(20) == 0) {
+			region.setBlockState(pos, ModBlocks.DIRTY_DAMP_CARPET.getDefaultState(), Block.NOTIFY_ALL, 1);
+		} else if (state.isOf(Blocks.YELLOW_WOOL)) {
+			region.setBlockState(pos, ModBlocks.DAMP_CARPET.getDefaultState(), Block.NOTIFY_ALL, 1);
+		}
+
+		if (state.isOf(Blocks.RED_CONCRETE) && random.nextInt(10) == 0) {
+			region.setBlockState(pos, ModBlocks.SMOKE_DETECTOR.getDefaultState(), Block.NOTIFY_ALL, 1);
+		} else if (state.isOf(Blocks.RED_CONCRETE)) {
+			region.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL, 1);
+		}
 	}
 
 	@Override
